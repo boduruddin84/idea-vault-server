@@ -1,19 +1,18 @@
-const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const dotenv = require('dotenv');
-const cors = require('cors');
+const express = require("express");
+const { MongoClient, ServerApiVersion } = require("mongodb");
+const dotenv = require("dotenv");
+const cors = require("cors");
 dotenv.config();
 const app = express();
 app.use(cors());
 const port = process.env.PORT || 8080;
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-}); 
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
 
-
-
-const uri = "mongodb+srv://idea-vault-server:KbCYjJORZkyGkjTV@cluster0.cr3aexn.mongodb.net/?appName=Cluster0";
+const uri =
+  "mongodb+srv://idea-vault-server:KbCYjJORZkyGkjTV@cluster0.cr3aexn.mongodb.net/?appName=Cluster0";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -21,7 +20,7 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
 });
 
 async function run() {
@@ -35,18 +34,21 @@ async function run() {
     const ideasCollection = db.collection("ideas");
 
     app.get("/ideas", async (req, res) => {
-    try {
+      try {
         const cursor = ideasCollection.find();
         const result = await cursor.toArray();
         res.send(result);
-    } catch (error) {
+      } catch (error) {
         res.status(500).send({ message: "Error fetching ideas", error });
-    }
-});
+      }
+    });
+    app.get("/ideas/:ideaId", async (req, res) => {
+      const {ideaId} = req.params;
+    });
 
-
-
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!",
+    );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
@@ -54,7 +56,6 @@ async function run() {
 }
 run().catch(console.dir);
 
-
-app.listen(8080, '0.0.0.0', () => {
+app.listen(8080, "0.0.0.0", () => {
   console.log(`Example app listening on port ${port}`);
 });
