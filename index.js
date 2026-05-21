@@ -1,5 +1,5 @@
 const express = require("express");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const dotenv = require("dotenv");
 const cors = require("cors");
 dotenv.config();
@@ -43,7 +43,15 @@ async function run() {
       }
     });
     app.get("/ideas/:ideaId", async (req, res) => {
+    try{
       const {ideaId} = req.params;
+      const query = { _id: new ObjectId(ideaId)};
+      const result = await ideasCollection.findOne(query);
+      res.send(result);
+    } catch (error) {
+        res.status(500).send({ message: "Error fetching ideas", error });
+      }
+      
     });
 
     console.log(
