@@ -5,7 +5,7 @@ const cors = require('cors');
 dotenv.config();
 const app = express();
 app.use(cors());
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8080;
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
@@ -31,12 +31,18 @@ async function run() {
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
 
-    
+    const db = client.db("idea-vault-server");
+    const ideasCollection = db.collection("ideas");
 
-    app.get("/ideas"
-        , async(req, res)=>{
-
-        })
+    app.get("/ideas", async (req, res) => {
+    try {
+        const cursor = ideasCollection.find();
+        const result = await cursor.toArray();
+        res.send(result);
+    } catch (error) {
+        res.status(500).send({ message: "Error fetching ideas", error });
+    }
+});
 
 
 
@@ -49,6 +55,6 @@ async function run() {
 run().catch(console.dir);
 
 
-app.listen(port, () => {
+app.listen(8080, '0.0.0.0', () => {
   console.log(`Example app listening on port ${port}`);
 });
