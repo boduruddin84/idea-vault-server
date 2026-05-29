@@ -12,7 +12,7 @@ app.get("/", (req, res) => {
 });
 
 const uri =
-  "mongodb+srv://idea-vault-server:KbCYjJORZkyGkjTV@cluster0.cr3aexn.mongodb.net/?appName=Cluster0";
+  process.env.MONGODB_URI;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -22,6 +22,15 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
+
+const logger = (req, res, next) => {
+  next();
+};
+
+const verifyToken = async (req, res, next) => {
+  const { authorization } = req.headers;
+  next();
+}
 
 async function run() {
   try {
@@ -42,7 +51,16 @@ async function run() {
         res.status(500).send({ message: "Error fetching ideas", error });
       }
     });
-    app.get("/ideas/:ideaId", async (req, res) => {
+    app.get("/trending", async (req, res) => {
+      try {
+        const cursor = ideasCollection.find().limit(6);
+        const result = await cursor.toArray();
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: "Error fetching ideas", error });
+      }
+    });
+    app.get("/ideas/:ideaId", logger, verifyToken, async (req, res) => {
     try{
       const {ideaId} = req.params;
       const query = { _id: new ObjectId(ideaId)};
