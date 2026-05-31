@@ -120,6 +120,37 @@ async function run() {
       }
     });
 
+    app.get("/myIdeas", async (req, res) => {
+      const email = req.query.email;
+
+      const result = await newIdeasCollection.find({ userEmail: email }).toArray();
+
+      res.send(result);
+    });
+
+    app.patch("/ideas/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const updatedData = req.body;
+
+      const result = await newIdeasCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: updatedData },
+      );
+
+      res.send(result);
+    });
+
+    app.delete("/ideas/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const result = await newIdeasCollection.deleteOne({
+        _id: new ObjectId(id),
+      });
+
+      res.send(result);
+    });
+
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!",
     );
